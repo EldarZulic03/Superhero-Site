@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SuperHero Database</title>
+        <meta charset="utf-8">
+        <meta name = "description" content = "Web app to showcase REST API I built">
+        <link rel = "stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>SuperHero Database!</h1>
+
+        <div id = "search_results">
+
+        </div>
+
+        <h2>Favourites List</h2>
+        <form id ='create_list_form'>
+            <input type = "text" id = "list_name" placeholder="Enter List Name">
+            <input type = "text" id = "list_content" placeholder = "Enter Hero IDs">
+            <button type = "submit" id = "create_list_button">Create List</button>
+        </form>
+        <form id = "edit_list_form">
+            <input type = "text" id="edit_name" placeholder="Enter List Name">
+            <input type="text" id="edit_content" placeholder="Enter Hero IDs">
+            <button type="submit" id="edit_list_button">Edit List</button>
+        </form>
+        <form id="delete_list_form">
+            <input type="text" id="delete_name" placeholder="Enter List Name">
+            <button type="submit" id="retrieve_list_button">Retrieve List</button>
+        </form>
+
+        <ul id="lists"></ul>
+
+        <h2>Search For SuperHeroes</h2>
+
+        <form id="search_form">
+            <input type="text" id="search_input" placeholder="Search For SuperHero">
+            <select id="search_field">
+                <option value="name">Name</option>
+                <option value="race">Race</option>
+                <option value="publisher">publisher</option>
+                <option value="power">Power</option>
+            </select>
+            <button type="submit" id="search_button">Search</button>
+        </form>
+
+        <h2>Sort Heros By:</h2>
+        <select id="sort_by">
+            <option value="none">none</option>
+            <option value="name">Name</option>
+            <option value="race">Race</option>
+            <option value="publisher">Publisher</option>
+            <option value="power">Power</option>
+        </select>
+
+        <form id="retrieve_form">
+            <input type="text" id="display_length" placeholder="Number of Results">
+        </form>
+        
+        <div id="sorted_results"></div>
+
+        <h2>Displayed SuperHeroes</h2>
+        <button id="clear_button">Clear</button>
+        <div id = "short_display"></div>
+        <div id="data_display"></div>    
+
+        <script src="script.js"></script>
+    </body>
+</html>

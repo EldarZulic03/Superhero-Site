@@ -11,9 +11,9 @@ const cache = flatCache.load('superCache');
 cache.setKey('superhero_info', jsonSuperInfo);
 cache.setKey('superhero_powers', jsonSuperPower);
 
-// app.use(express.static('../client'));
-// app.use(express.json({limit: '2mb'}));
-// app.use(express.urlencoded({extended:true}));
+app.use(express.static('../client'));
+app.use(express.json({limit: '2mb'}));
+app.use(express.urlencoded({extended:true}));
 
 //check if api is running
 //local
