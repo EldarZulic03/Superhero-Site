@@ -7,11 +7,11 @@
         <link rel = "stylesheet" href="style.css">
     </head>
     <body>
-        <h1>SuperHero Database!</h1>
+        <h1>SuperHeroes!</h1>
 
-        <div id = "search_results">
-        </div>
+        <div id = "results"></div>
 
+        <div id = "fav_div">
         <h2>Favourites List</h2>
         <form id ='create_list_form'>
             <input type = "text" id = "list_name" placeholder="Enter List Name">
@@ -27,9 +27,10 @@
             <input type="text" id="delete_name" placeholder="Enter List Name">
             <button type="submit" id="retrieve_list_button">Retrieve List</button>
         </form>
+        </div>  
 
         <ul id="lists"></ul>
-
+        <div id = "hero_search">
         <h2>Search For SuperHeroes</h2>
 
         <form id="search_form">
@@ -42,7 +43,9 @@
             </select>
             <button type="submit" id="search_button">Search</button>
         </form>
+        </div>
 
+        <div id="hero_sort">
         <h2>Sort Heros By:</h2>
         <select id="sort_by">
             <option value="none">none</option>
@@ -52,14 +55,18 @@
             <option value="power">Power</option>
         </select>
 
+
         <form id="retrieve_form">
             <input type="text" id="display_number" placeholder="Number of Results">
         </form>
+        </div> 
         
         <div id="sorted_results"></div>
 
+        <div id = "display_div">
         <h2>Displayed SuperHeroes</h2>
-        <button id="clear_button">Clear</button>
+        <button id="clear_btn">Clear</button>
+        </div>
         <div id = "short_display"></div>
         <div id="data_display"></div>    
 
