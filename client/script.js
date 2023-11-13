@@ -4,11 +4,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
     const search_field = document.getElementById('search_field');
     const search_btn = document.getElementById('search_btn');
     const create_list_btn = document.getElementById('create_list_button');
-    const edit_list_btn = document.getElementById('edit_list_button');
+    const edit_btn = document.getElementById('edit_list_button');
     const edit_list_inpt = document.getElementById('edit_content');
     const edit_name_inpt = document.getElementById('edit_list_name');
 
-    const del_list_btn = document.getElementById('del_list_btn');
+    const del_btn = document.getElementById('del_list_btn');
     const del_inpt = document.getElementById('del_name');
 
     const ret_btn = docment.getElementById('ret_list_btn');
@@ -128,9 +128,257 @@ document.addEventListener("DOMContentLoaded", ()=>{
             search = search_field.value;
         }
 
+        const searchInpt = clean(search_input.value);
+
+        if(!searchInpt){
+            alert("The field and the search input are needed")
+            return;
+        }
+
+        try{
+            const url = `http://localhost:5001/search?=${search}&pattern=${searchInpt}&n=${n}`;
+            const resp = await fetch(url);
+
+            if(resp.ok){
+                const result = await resp.json();
+                displayHeroes(result,false,sort)
+            }else{
+                alert("ERROR: could not search for superheroes");
+            }
         
+        }catch(error){
+            console.error("API Error: ", error);
+            alert("Error popped up while search for the superheroes");
+        }
 
-    })
 
+    });
+
+    //checks if create list button was clicked
+    create_list_btn.addEventListener("click", async(e)=>{
+        e.preventDefault();
+        const name = clean(listName_inpt.value);
+        const heroes = listID_inpt.value.split(',').map(id => parseInt(id));
+
+        if(!name || !heroes || heroes.length ===0){
+            alert("The name of the list and the heroe IDS are needed to create the list");
+            return;
+        }
+        try{
+            const url = "http://localhost:5001/lists";
+            const body = JSON.stringify({name, heroes});
+
+            const resp = await fetch(url,{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body,
+            });
+
+            if(resp.ok){
+                alert("List Created!");
+
+            }else{
+                alert("ERROR: List was already previously made");
+            }
+
+        }catch (error){
+            console.error("API calling error:", error);
+            alert("Error occured while making the list")
+        }
+    });
+    //checks if edit button was clicked
+    edit_btn.addEventListener("click", async(e) =>{
+        e.preventDefault();
+        const listName = clean(edit_name_inpt.value);
+        const heroes = edit_list_inpt.value.split(',').map(id =>{
+            parseInt(id);
+        });
+        
+        if(!listName || !heroes || heroes.length ===0){
+            alert("The list name and heroes names are required in the fields.")
+            return;
+        }
+
+        try{
+            const url = `http://localhost:5001/lists/${listName}`;
+            const body = JSON.stringify({heroes});
+
+            const resp = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body,
+            });
+            if(resp.ok){
+                alert("List was edited");
+
+            }else{
+                alert("List was not edited");
+            }
+        }catch(error){
+            alert("ERROR brought up while editing the list")
+            console.error("API calling error: ", error);
+            
+        }
+    });
+
+    del_btn.addEventListener("click", async(e)=>{
+        
+        e.preventDefault();
+        const deletedList = clean(del_btn.value);
+
+        if(!deletedList){
+            alert("Enter name of the list you want to delete");
+            return;
+        }
+
+        try{
+            const url = `http://localhost:5001/lists/${deletedList}`;
+
+            const resp  = await fetch(url,{
+                method: "DELETE",
+            });
+
+            if(resp.ok){
+                alert("List deleted");
+            }else{
+                alert("Could not delete list")
+            }
+        }catch(error){
+            console.error("API calling eror: ", error);
+            alert("Error while trying to delete list");
+        }
+    });
+
+    //checks if ret list button was clicked
+    ret_btn.addEventListener("click", async(e) =>{
+
+        e.preventDefault();
+        const sort = sort_select.value;
+        const listName = clean(ret_inpt.value);
+
+        if(!listName){
+            alert("Name of list is needed");
+            return;
+        }
+        try{
+            const url = `http://localhost:5001/lists/${listName}`;
+            const contentUrl = `http://localhost:5001/lists/${listName}/superheroes`;
+
+            const contentUrlResp = await fetch(contentUrl);
+            const resp = await fetch(url);
+
+            if(contentUrlResp.ok && resp.ok){
+                const result = await resp.json();
+                const contentUrlResult = await contentUrlResp.json();
+                alert("list retrieved");
+
+                displayHeroes(contentUrlResult, result, sort);
+            }
+        }catch(error){
+            console.error("APi calling error",error);
+            alert("error while creating list")
+        }
+    });
+   
 });
+
+
+const sortHeroes = (heroes,sortVal) =>{
+    if(sortVal==="race"){
+        return sortByRace(heroes);
+    }else if(sortVal ==='power'){
+        return sortByPower(heroes);
+
+    }
+    else if(sortVal ==="name"){
+        return sortByName(heroes);
+    }
+    else if(sortVal==='publisher'){
+        return sortByPublisher(heroes);
+    }
+};
+
+
+function capLetter(word){
+    
+    const firstChar = word.charAt(0);
+    const capital = firstChar.toUpperCase();
+    
+    const restOfWord = word.slice(1);
+    const newWord = capital + restOfWord;
+
+    return newWord;
+};
+
+function sortByRace(heroes){
+    if(!heroes.superheroes || !Array.isArray(heroes)){
+        return heroes;
+    };
+
+    heroes.superheroes.sort((a,b) =>{
+        a.info.Race.localeCompare(b.info.Race)
+    });
+
+    return heroes;
+};
+
+function sortByName(heroes){
+
+    if(!Array.isArray(heroes.superheroes) || !heroes.superheroes){
+        return heroes;
+    }
+
+    heroes.superheroes.sort((a,b) =>{
+        a.name.localeCompare(b.name)
+    })
+};
+
+function sortByPublisher(heroes){
+    if(!Array.isArray(heroes.superheroes) || !heroes.superheroes){
+        return heroes;
+    }
+
+    heroes.superheroes.sort((a,b) =>{
+        a.info.Publisher.localeCompare(b.info.Publisher)
+    });
+    return heroes;
+};
+
+function sortByPowers(heroes){
+
+    if(!heroes.superheroes || !Array.isArray(heroes.superheroes)){
+        return heroes;
+    }
+
+    heroes.superheroes.sort((a,b) =>{
+        const aPowers = Object.values(a.powers).filter(power =>{
+            power === "True"
+        }).length;
+        const bPowers = Object.value(b.powers).filter(power =>{
+            power === "True"
+        }).length;
+        return aPowers - bPowers;
+    });
+    return heroes;
+}
+
+function clean(needsCleaning){
+
+    needsCleaning.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    needsCleaning.replace(/<\/?[^>]+(>|$)/g, '');
+    //removes any javascript code or html tags
+
+    return needsCleaning;
+};
+
+function positiveCheck(str){
+    var num = Math.floor(Number(str));
+    return  num >=0 && String(n) && num !== Infinity;
+};
+
+
 
