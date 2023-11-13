@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
             alert("Error popped up while search for the superheroes");
         }
 
-
+        //searches for heroes that fit the parameters
     });
 
     //checks if create list button was clicked
@@ -189,7 +189,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
             console.error("API calling error:", error);
             alert("Error occured while making the list")
         }
+        //creates list with chosen name and heroes
     });
+
     //checks if edit button was clicked
     edit_btn.addEventListener("click", async(e) =>{
         e.preventDefault();
@@ -225,26 +227,31 @@ document.addEventListener("DOMContentLoaded", ()=>{
             alert("ERROR brought up while editing the list")
             console.error("API calling error: ", error);
             
-        }
+        };//error handling
+        //edits the selected list
     });
 
+    //checks if delete button is clicked
     del_btn.addEventListener("click", async(e)=>{
         
         e.preventDefault();
-        const deletedList = clean(del_btn.value);
+        const deletedList = clean(del_inpt.value);
 
         if(!deletedList){
             alert("Enter name of the list you want to delete");
             return;
         }
 
+        //if delete list button is clicked deletes the named list
+
         try{
             //calls api
             const url = `http://localhost:5001/lists/${deletedList}`;
+            //api call 
 
             const resp  = await fetch(url,{
                 method: "DELETE",
-            });
+            });//deleted method
 
             if(resp.ok){
                 alert("List deleted");
@@ -269,11 +276,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
             return;
         }
         try{
+            //api call 
             const url = `http://localhost:5001/lists/${listName}`;
             const contentUrl = `http://localhost:5001/lists/${listName}/superheroes`;
 
             const contentUrlResp = await fetch(contentUrl);
             const resp = await fetch(url);
+            //await api response
 
             if(contentUrlResp.ok && resp.ok){
                 const result = await resp.json();
@@ -281,8 +290,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
                 alert("list retrieved");
 
                 displayHeroes(contentUrlResult, result, sort);
+                //displays the heros 
             }
         }catch(error){
+            //error handling
             console.error("APi calling error",error);
             alert("error while creating list")
         }
@@ -290,7 +301,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
    
 });
 
-
+//function to choose which sorting function the heroes will go to 
 const sortHeroes = (heroes,sortVal) =>{
     if(sortVal==="race"){
         return sortByRace(heroes);
@@ -304,6 +315,7 @@ const sortHeroes = (heroes,sortVal) =>{
     else if(sortVal==='publisher'){
         return sortByPublisher(heroes);
     }
+
 };
 
 
@@ -318,6 +330,7 @@ function capLetter(word){
     return newWord;
 };
 
+//sorts by race
 function sortByRace(heroes){
     if(!heroes.superheroes || !Array.isArray(heroes)){
         return heroes;
@@ -326,10 +339,11 @@ function sortByRace(heroes){
     heroes.superheroes.sort((a,b) =>{
         a.info.Race.localeCompare(b.info.Race)
     });
-
+    //sorts by race alphabetically
     return heroes;
 };
 
+//sorts by name
 function sortByName(heroes){
 
     if(!Array.isArray(heroes.superheroes) || !heroes.superheroes){
@@ -339,8 +353,11 @@ function sortByName(heroes){
     heroes.superheroes.sort((a,b) =>{
         a.name.localeCompare(b.name)
     })
+    //sorts alphabetically
+    return heroes;
 };
 
+//sorts by publisher
 function sortByPublisher(heroes){
     if(!Array.isArray(heroes.superheroes) || !heroes.superheroes){
         return heroes;
@@ -348,10 +365,12 @@ function sortByPublisher(heroes){
 
     heroes.superheroes.sort((a,b) =>{
         a.info.Publisher.localeCompare(b.info.Publisher)
+        //returns which is publisher alphabetically
     });
     return heroes;
 };
 
+//sorts list of heroesby power
 function sortByPowers(heroes){
 
     if(!heroes.superheroes || !Array.isArray(heroes.superheroes)){
@@ -359,17 +378,20 @@ function sortByPowers(heroes){
     }
 
     heroes.superheroes.sort((a,b) =>{
+
         const aPowers = Object.values(a.powers).filter(power =>{
             power === "True"
         }).length;
         const bPowers = Object.value(b.powers).filter(power =>{
             power === "True"
         }).length;
+        //returns which hero has more powers a or b
         return aPowers - bPowers;
     });
     return heroes;
 }
 
+//cleans the input data so no issues arise
 function clean(needsCleaning){
 
     needsCleaning.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
@@ -379,6 +401,8 @@ function clean(needsCleaning){
     return needsCleaning;
 };
 
+
+//checks if number for display length is positive or not
 function positiveCheck(str){
     var num = Math.floor(Number(str));
     return  num >=0 && String(n) && num !== Infinity;
