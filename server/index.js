@@ -5,11 +5,12 @@ import jsonSuperPower from './superhero_powers.json' assert {type:'json'}
 //Import Statements
 
 const app = express();
-const port = 5001;
+const port = 5001;//server port number
 
 const cache = flatCache.load('superCache');
 cache.setKey('superhero_info', jsonSuperInfo);
 cache.setKey('superhero_powers', jsonSuperPower);
+//sets index.html as index file
 
 app.use(express.static('../client'));
 app.use(express.json({limit: '2mb'}));
@@ -23,7 +24,6 @@ app.listen(port, ()=>{
 
 
 //GET superhero
-
 app.get('/superhero/:id', (req,res)=>{
     const id = parseInt(req.params.id);
     const superInfo = cache.getKey('superhero_info');
@@ -35,27 +35,29 @@ app.get('/superhero/:id', (req,res)=>{
         res.json(superHero);
     }else{
         res.status(404).json({error: 'SuperHero Not Found'});
+        //error if superheroe doesnt exist
     }
 });
 
 
 //GET powers
-
 app.get('/superhero/:id/powers', (req,res)=>{
     const id = parseInt(req.params.id);
-    const superInfo = cache.getKey('superhero_info');
+    const superInfo = cache.getKey('superhero_info');//gets hero info
+
     const superHero = superInfo.find((hero) =>{
         hero.id === id;
+
     })
 
     if(superHero){
         const superHeroName = superHero.name;
         const superHeroPowers = cache.getKey('superhero_powers');
-        let powers = superHeroPowers.find((hero) =>{
+        let heroPowers = superHeroPowers.find((hero) =>{
             hero.hero_names ===superHeroName;
         });
 
-        powers = removeFalseAttributes(powers);
+        powers = deleteAttributes(heroPowers);//gets rid of false attributes
 
         if(powers){
             res.json(powers);
@@ -70,14 +72,15 @@ app.get('/superhero/:id/powers', (req,res)=>{
 //GET matching superheroes through search
 app.get('/search', (req,res)=>{
     
-    const{field, pattern, n} = req.query;
+    const{field, pattern, n} = req.query;//gets the query
+
     const superInfo = cache.getKey('superhero_info') || [];
     const superHeroPowers = cache.getKey('superhero_powers') || [];
 
 
     if(!field || !pattern){
-        return res.status(400).json({error: 'Field & Pattern Are Required Query Paramaters'});
-
+        return res.status(400).json({error: 'Field & Pattern Are Needed to Query'});
+        //error if there is no field andpattern
     }
 
     let matchingHeroes;
@@ -85,6 +88,7 @@ app.get('/search', (req,res)=>{
 
     if (field.toLowerCase() !== "power"){
         const superInfo = cache.getKey('superhero_info');
+        //gets matching heroes
         matchingHeroes = superInfo.filter((hero)=>{
             hero[field] && hero[field].toLowerCase().includes(pattern.toLowerCase());
         });
@@ -100,7 +104,7 @@ app.get('/search', (req,res)=>{
         matchingHeroes = superHeroPowers.filter((powers)=>{
             powers[pattern]==="True"
         });
-        matchingHeroes = removeFalse(matchingHeroes);
+        matchingHeroes = remove(matchingHeroes);//removes matching heroes from the results list
 
         heroIDs = matchingHeroes.map((hero)=>{
             const heroName = hero.hero_names;
@@ -115,8 +119,6 @@ app.get('/search', (req,res)=>{
 
     }
 
-    //debugging 
-    console.log(heroIDs)
     heroIDs = heroIDs.filter((id) =>{
         id !== undefined
     });
@@ -129,19 +131,20 @@ app.get('/search', (req,res)=>{
             let powers = superHeroPowers.find((powers)=>{
                 powers.hero_names ===superHero.name;
             });
-            powers = removeFalseAttributes(powers);
+            powers = deleteAttributes(powers);
             return{name: superHero.name, info: superHero, powers };
         }
         return null;
     });
-    let listName = "NA";
+
+    let listsName = "NONE";
 
     if(n && heroList.length>n){
         heroList = heroList.slide(0,n);
     }//cuts the search to fit the limit
 
     res.json({
-        listName, 
+        listsName, 
         superheroes: heroList.filter(Boolean)
     });
 });
@@ -193,7 +196,9 @@ app.post('/lists/:name', (req,res)=>{
     cache.save();
 
     res.status(200).json({message: "List Successfully Updated"});
+    //edits hero list 
 });
+
 
 //Get List
 app.get('/lists/:name', (req,res)=>{
@@ -207,6 +212,7 @@ app.get('/lists/:name', (req,res)=>{
 
     const heroes = lists[listName];
     res.json({listName,heroes});
+    //returns list of hero names
 });
 
 //Delete List
@@ -232,11 +238,12 @@ app.get('/lists/:name/superheroes', (req,res)=>{
     const superHeroPowers = cache.getKey('superhero_powers')||[];
 
     if(!lists[listName]){
-        return res.status(404).json({error:'List Name Does Not Exist'});
+        return res.status(404).json({error:'List Name Doesnt Exist'});
 
     }
 
     const heroIDs = lists[listName];
+    //heroID
     const heroList = heroIDs.map((id)=>{
         const superhero = superInfo.find((hero)=>{
             hero.id ===id;
@@ -245,16 +252,17 @@ app.get('/lists/:name/superheroes', (req,res)=>{
             let powers = superHeroPowers.find((powers) =>{
                 powers.hero_names === superhero.name;
             });
-            powers = removeFalseAttributes(powers);
+            powers = deleteAttributes(powers);
             return{name: superhero, info: superhero, powers};
 
         }
         return null;
     });
     res.json({listName, superheroes: heroList.filter(Boolean)});
+    //returns superhero info
 });
 
-function removeFalseAttributes(data){
+function deleteAttributes(data){
     const result = {};
 
     for(const key in data){
@@ -266,7 +274,7 @@ function removeFalseAttributes(data){
     return result;
 }
 
-function removeFalse(jsonData){
+function remove(jsonData){
     if(jsonData && jsonData.hero_names){
         const cleanedData = {hero_names: jsonData.hero_names};
         for(const key in jsonData){

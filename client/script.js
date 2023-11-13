@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", ()=>{
-    
+    //creating all event listeners
     const search_input = document.getElementById("search_input");
     const search_field = document.getElementById('search_field');
     const search_btn = document.getElementById('search_btn');
@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
     const ret_btn = docment.getElementById('ret_list_btn');
     const ret_inpt = document.getElementById('ret_name')
 
-    const list_cont = document.getElementById('lists');
     const listID_inpt = document.getElementById('list_content');
     const listName_inpt = document.getElementById('list_name');
     const sort_select = document.getElementById('sort_by');
@@ -26,6 +25,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     const display_num = document.getElementById('display_number')
     let n = 6;
 
+    //function to display the searched heroes
     const displayHeroes = (data, info,  sort) =>{
         hero_display.innerHTML = "";
         small_HD.innerHTML = "";
@@ -136,6 +136,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
         }
 
         try{
+            //calls api
             const url = `http://localhost:5001/search?=${search}&pattern=${searchInpt}&n=${n}`;
             const resp = await fetch(url);
 
@@ -165,6 +166,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
             return;
         }
         try{
+            //calls api
             const url = "http://localhost:5001/lists";
             const body = JSON.stringify({name, heroes});
 
@@ -202,6 +204,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
         }
 
         try{
+            //calls api
             const url = `http://localhost:5001/lists/${listName}`;
             const body = JSON.stringify({heroes});
 
@@ -236,6 +239,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
         }
 
         try{
+            //calls api
             const url = `http://localhost:5001/lists/${deletedList}`;
 
             const resp  = await fetch(url,{
