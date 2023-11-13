@@ -53,7 +53,7 @@ h2{
     border-radius: 5px;
     margin: 10px;
 }
-#search_button:hover{
+#search_btn:hover{
     background-color: orange;
 }
 #hero_search{
@@ -84,7 +84,12 @@ h2{
     margin-left: 5%;
     padding: 10px;
 }
-#delete_list_form{
+#del_list_form{
+    text-align: left;
+    margin-left: 5%;
+    padding: 10px;
+}
+#ret_list_form{
     text-align: left;
     margin-left: 5%;
     padding: 10px;
@@ -139,7 +144,7 @@ h2{
     background-color: #f0dbc2 ;
 
 }
-#data_display{
+#hero_display{
     display:grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     grid-gap: 20px;
@@ -151,7 +156,7 @@ h2{
     margin-left: 1%;
     margin-right:1%;
 }
-#short_display{
+#small_display{
     margin-top:20px;
     padding: 10px;
     border: 1px solid black;

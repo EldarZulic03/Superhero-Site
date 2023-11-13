@@ -19,14 +19,19 @@
             <button type = "submit" id = "create_list_button">Create List</button>
         </form>
         <form id = "edit_list_form">
-            <input type = "text" id="edit_name" placeholder="Enter List Name">
+            <input type = "text" id="edit_list_name" placeholder="Enter List Name">
             <input type="text" id="edit_content" placeholder="Enter Hero IDs">
             <button type="submit" id="edit_list_button">Edit List</button>
         </form>
-        <form id="delete_list_form">
-            <input type="text" id="delete_name" placeholder="Enter List Name">
-            <button type="submit" id="retrieve_list_button">Retrieve List</button>
+        <form id="del_list_form">
+            <input type="text" id="del_name" placeholder="Enter List Name">
+            <button type="submit" id="del_list_btn">Delete List</button>
         </form>
+        <form id="ret_list_form">
+            <input type="text" id="ret_name" placeholder="Enter List Name">
+            <button type="submit" id="ret_list_btn">Retrieve List</button>
+        </form>
+        
         </div>  
 
         <ul id="lists"></ul>
@@ -41,7 +46,7 @@
                 <option value="publisher">publisher</option>
                 <option value="power">Power</option>
             </select>
-            <button type="submit" id="search_button">Search</button>
+            <button type="submit" id="search_btn">Search</button>
         </form>
         </div>
 
@@ -61,14 +66,14 @@
         </form>
         </div> 
         
-        <div id="sorted_results"></div>
+        <!-- <div id="sorted_results"></div> -->
 
         <div id = "display_div">
         <h2>Displayed SuperHeroes</h2>
         <button id="clear_btn">Clear</button>
         </div>
-        <div id = "short_display"></div>
-        <div id="data_display"></div>    
+        <div id = "small_display"></div>
+        <div id="hero_display"></div>    
 
         <script src="script.js"></script>
     </body>
