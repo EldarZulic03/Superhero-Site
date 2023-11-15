@@ -2,8 +2,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
     //creating all event listeners
     const search_input = document.getElementById("search_input");
     const search_field = document.getElementById('search_field');
-    const search_btn = document.getElementById('search_btn');
+    const search_btn = document.getElementById("search_btn");
+
     const create_list_btn = document.getElementById('create_list_button');
+    
     const edit_btn = document.getElementById('edit_list_button');
     const edit_list_inpt = document.getElementById('edit_content');
     const edit_name_inpt = document.getElementById('edit_list_name');
@@ -102,57 +104,57 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
     //searches when the search button is clicked
     search_btn.addEventListener("click", async (e) =>{
-        
+        alert("search button pressed")
         e.preventDefault();
         
         
-        //check the number of heroes that need to be displayed
-        if(display_num.value){
-            if(!positiveCheck(display_num.value)){
-                alert("Number of displayed heroes must be positive.")
-            }
-            else{
-                n = display_num.value;
-            }
-        }else{
-            n = 6;
-        }
+        // //check the number of heroes that need to be displayed
+        // if(display_num.value){
+        //     if(!positiveCheck(display_num.value)){
+        //         alert("Number of displayed heroes must be positive.")
+        //     }
+        //     else{
+        //         n = display_num.value;
+        //     }
+        // }else{
+        //     n = 6;
+        // }
 
-        let search;
-        const sort = sort_select.value;
+        // let search;
+        // const sort = sort_select.value;
         
 
-        if(search_field.value !== "name"){
-            search = capLetter(search_field.value);
-        }else{
-            search = search_field.value;
-        }
+        // if(search_field.value !== "name"){
+        //     search = capLetter(search_field.value);
+        // }else{
+        //     search = search_field.value;
+        // }
 
-        const searchInpt = clean(search_input.value);
+        // const searchInpt = clean(search_input.value);
 
-        if(!searchInpt){
-            alert("The field and the search input are needed")
-            return;
-        }
+        // if(!searchInpt){
+        //     alert("The field and the search input are needed")
+        //     return;
+        // }
 
-        try{
-            //calls api
-            const url = `http://localhost:5001/search?=${search}&pattern=${searchInpt}&n=${n}`;
-            const resp = await fetch(url);
+        // try{
+        //     //calls api
+        //     const url = `http://localhost:5001/search?=${search}&pattern=${searchInpt}&n=${n}`;
+        //     const resp = await fetch(url);
 
-            if(resp.ok){
-                const result = await resp.json();
-                displayHeroes(result,false,sort)
-            }else{
-                alert("ERROR: could not search for superheroes");
-            }
+        //     if(resp.ok){
+        //         const result = await resp.json();
+        //         displayHeroes(result,false,sort)
+        //     }else{
+        //         alert("ERROR: could not search for superheroes");
+        //     }
         
-        }catch(error){
-            console.error("API Error: ", error);
-            alert("Error popped up while search for the superheroes");
-        }
+        // }catch(error){
+        //     console.error("API Error: ", error);
+        //     alert("Error popped up while search for the superheroes");
+        // }
 
-        //searches for heroes that fit the parameters
+        // //searches for heroes that fit the parameters
     });
 
     //checks if create list button was clicked
