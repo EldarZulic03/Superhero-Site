@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", ()=>{
     //creating all event listeners
-    const search_input = document.getElementById("search_input");
-    const search_field = document.getElementById('search_field');
-    const search_btn = document.getElementById("search_btn");
+    
+    const searchForm = document.getElementById('search_form');
 
     const create_list_btn = document.getElementById('create_list_button');
     
@@ -93,6 +92,68 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 
 
+    searchForm.addEventListener("click", async(e)=>{
+        e.preventDefault();
+
+        const search_input = document.getElementById("search_input");
+        const search_field = document.getElementById('search_field');
+        const search_btn = document.getElementById('search_btn');
+
+        //searches when the search button is clicked
+        search_btn.addEventListener("click", async (e) =>{
+            e.preventDefault();
+            alert("search button pressed");
+        
+        
+            //check the number of heroes that need to be displayed
+            if(display_num.value){
+                if(!positiveCheck(display_num.value)){
+                    alert("Number of displayed heroes must be positive.")
+                }
+                else{
+                    n = display_num.value;
+                }
+            }else{
+                n = 6;
+            }
+
+            let search;
+            const sort = sort_select.value;
+            
+
+            if(search_field.value !== "name"){
+                search = capLetter(search_field.value);
+            }else{
+                search = search_field.value;
+            }
+
+            const searchInpt = clean(search_input.value);
+
+            if(!searchInpt){
+                alert("The field and the search input are needed")
+                return;
+            }
+
+            try{
+                //calls api
+                const url = `http://localhost:5001/search?=${search}&pattern=${searchInpt}&n=${n}`;
+                const resp = await fetch(url);
+
+                if(resp.ok){
+                    const result = await resp.json();
+                    displayHeroes(result,false,sort)
+                }else{
+                    alert("ERROR: could not search for superheroes");
+                }
+        
+            }catch(error){
+                console.error("API Error: ", error);
+                alert("Error popped up while search for the superheroes");
+            }
+
+            //searches for heroes that fit the parameters
+        });
+    });
 
     //clears the hero display and small display if the clear button is clicked
     clear_btn.addEventListener("click", async(e) =>{
@@ -102,60 +163,60 @@ document.addEventListener("DOMContentLoaded", ()=>{
     })
 
 
-    //searches when the search button is clicked
-    search_btn.addEventListener("click", async (e) =>{
-        alert("search button pressed")
-        e.preventDefault();
+    // //searches when the search button is clicked
+    // search_btn.addEventListener("click", async (e) =>{
+    //     e.preventDefault();
+    //     alert("search button pressed");
         
         
-        // //check the number of heroes that need to be displayed
-        // if(display_num.value){
-        //     if(!positiveCheck(display_num.value)){
-        //         alert("Number of displayed heroes must be positive.")
-        //     }
-        //     else{
-        //         n = display_num.value;
-        //     }
-        // }else{
-        //     n = 6;
-        // }
+    //     //check the number of heroes that need to be displayed
+    //     if(display_num.value){
+    //         if(!positiveCheck(display_num.value)){
+    //             alert("Number of displayed heroes must be positive.")
+    //         }
+    //         else{
+    //             n = display_num.value;
+    //         }
+    //     }else{
+    //         n = 6;
+    //     }
 
-        // let search;
-        // const sort = sort_select.value;
+    //     let search;
+    //     const sort = sort_select.value;
         
 
-        // if(search_field.value !== "name"){
-        //     search = capLetter(search_field.value);
-        // }else{
-        //     search = search_field.value;
-        // }
+    //     if(search_field.value !== "name"){
+    //         search = capLetter(search_field.value);
+    //     }else{
+    //         search = search_field.value;
+    //     }
 
-        // const searchInpt = clean(search_input.value);
+    //     const searchInpt = clean(search_input.value);
 
-        // if(!searchInpt){
-        //     alert("The field and the search input are needed")
-        //     return;
-        // }
+    //     if(!searchInpt){
+    //         alert("The field and the search input are needed")
+    //         return;
+    //     }
 
-        // try{
-        //     //calls api
-        //     const url = `http://localhost:5001/search?=${search}&pattern=${searchInpt}&n=${n}`;
-        //     const resp = await fetch(url);
+    //     try{
+    //         //calls api
+    //         const url = `http://localhost:5001/search?=${search}&pattern=${searchInpt}&n=${n}`;
+    //         const resp = await fetch(url);
 
-        //     if(resp.ok){
-        //         const result = await resp.json();
-        //         displayHeroes(result,false,sort)
-        //     }else{
-        //         alert("ERROR: could not search for superheroes");
-        //     }
+    //         if(resp.ok){
+    //             const result = await resp.json();
+    //             displayHeroes(result,false,sort)
+    //         }else{
+    //             alert("ERROR: could not search for superheroes");
+    //         }
         
-        // }catch(error){
-        //     console.error("API Error: ", error);
-        //     alert("Error popped up while search for the superheroes");
-        // }
+    //     }catch(error){
+    //         console.error("API Error: ", error);
+    //         alert("Error popped up while search for the superheroes");
+    //     }
 
-        // //searches for heroes that fit the parameters
-    });
+    //     //searches for heroes that fit the parameters
+    // });
 
     //checks if create list button was clicked
     create_list_btn.addEventListener("click", async(e)=>{
