@@ -27,9 +27,7 @@ app.listen(port, ()=>{
 app.get('/superhero/:id', (req,res)=>{
     const id = parseInt(req.params.id);
     const superInfo = cache.getKey('superhero_info');
-    const superHero = superInfo.find((hero)=>{
-        hero.id === id;
-    });
+    const superHero = superInfo.find((hero)=>hero.id === id);
 
     if(superHero){
         res.json(superHero);
@@ -42,112 +40,172 @@ app.get('/superhero/:id', (req,res)=>{
 
 //GET powers
 app.get('/superhero/:id/powers', (req,res)=>{
+
     const id = parseInt(req.params.id);
-    const superInfo = cache.getKey('superhero_info');//gets hero info
+    const superheroInfo = cache.getKey('superhero_info');
+    const superhero = superheroInfo.find((hero) => hero.id === id);
+  
+    if (superhero) {
+      const superheroName = superhero.name;
+      const superheroPowers = cache.getKey('superhero_powers');
+      let powers = superheroPowers.find((hero) => hero.hero_names === superheroName);
 
-    const superHero = superInfo.find((hero) =>{
-        hero.id === id;
-
-    })
-
-    if(superHero){
-        const superHeroName = superHero.name;
-        const superHeroPowers = cache.getKey('superhero_powers');
-        let heroPowers = superHeroPowers.find((hero) =>{
-            hero.hero_names ===superHeroName;
-        });
-
-        powers = deleteAttributes(heroPowers);//gets rid of false attributes
-
-        if(powers){
-            res.json(powers);
-        }else{
-            res.status(404).json({error:'SuperHero Powers Not Found'});
-        }
-    }else{
-        res.status(404).json({error: 'SuperHero Not Found'});
+      powers = remove(powers)
+  
+      if (powers) {
+        delete powers.hero_names;
+        res.json(powers);
+      } else {
+        res.status(404).json({ error: 'Superhero powers not found' });
+      }
+    } else {
+      res.status(404).json({ error: 'Superhero not found' });
     }
 });
 
-//GET matching superheroes through search
-app.get('/search', (req,res)=>{
-    
-    const{field, pattern, n} = req.query;//gets the query
-
-    const superInfo = cache.getKey('superhero_info') || [];
-    const superHeroPowers = cache.getKey('superhero_powers') || [];
-
-
-    if(!field || !pattern){
-        return res.status(400).json({error: 'Field & Pattern Are Needed to Query'});
-        //error if there is no field andpattern
+// SEARCH
+app.get('/search', (req, res) => {
+    const { field, pattern, n } = req.query;
+    const superheroInfo = cache.getKey('superhero_info') || [];
+    const superheroPowers = cache.getKey('superhero_powers') || [];
+  
+    if (!field || !pattern) {
+      return res.status(400).json({ error: 'Field and pattern are required query parameters.' });
     }
+    
+    let matchingSuperheroes;
+    let heroIds = [];
+  
+  
+    if (field.toLowerCase() !== "power") {
+      const superheroInfo = cache.getKey('superhero_info');
+      matchingSuperheroes = superheroInfo.filter((hero) =>
+        hero[field] && hero[field].toLowerCase().includes(pattern.toLowerCase())
+      );
+  
+      heroIds = matchingSuperheroes.map((item) => item.id);
+  
+    } else {
+      const superheroPowers = cache.getKey('superhero_powers');
+      matchingSuperheroes = superheroPowers.filter((powers) => powers[pattern] === "True");
+  
+      matchingSuperheroes = remove(matchingSuperheroes);
+  
+      heroIds = matchingSuperheroes.map((hero) => {
+        const heroName = hero.hero_names;
+        const matchingHero = superheroInfo.find((info) => info.name === heroName);
+    
+        if (matchingHero) {
+          return matchingHero.id;
+        }
+      });
+    
+    }
+  
+    //console.log(matchingSuperheroes)
+  
+    console.log(heroIds)
+  
+    heroIds = heroIds.filter((id) => id !== undefined);
+    
+  
+    //const heroIDs = lists[listName]; //array of heros
+    let superheroesInList = heroIds.map((id) => {
+      const superhero = superheroInfo.find((hero) => hero.id === id);
+      if (superhero) {
+        let powers = superheroPowers.find((powers) => powers.hero_names === superhero.name);
+        powers = deleteAttributes(powers)
+        return { name: superhero.name, info: superhero, powers };
+      }
+      return null;
+    });
+  
+    let listName = "NA";
+    
+    // cut the search to match limit
+    if (n && superheroesInList.length > n) {
+      superheroesInList = superheroesInList.slice(0, n);
+    } 
+  
+    res.json({ listName, superheroes: superheroesInList.filter(Boolean) });
+  
+  });
 
-    let matchingHeroes;
-    let heroIDs = [];
+// //GET matching superheroes through search
+// app.get('/search', (req,res)=>{
+    
+//     const{field, pattern, n} = req.query;//gets the query
 
-    if (field.toLowerCase() !== "power"){
-        const superInfo = cache.getKey('superhero_info');
-        //gets matching heroes
-        matchingHeroes = superInfo.filter((hero)=>{
-            hero[field] && hero[field].toLowerCase().includes(pattern.toLowerCase());
-        });
+//     const superInfo = cache.getKey('superhero_info') || [];
+//     const superHeroPowers = cache.getKey('superhero_powers') || [];
 
-        heroIDs = matchingHeroes.map((item)=>{
-            item.id
-        });
+
+//     if(!field || !pattern){
+//         return res.status(400).json({error: 'Field & Pattern Are Needed to Query'});
+//         //error if there is no field andpattern
+//     }
+
+//     let matchingHeroes;
+//     let heroIDs = [];
+
+//     if (field.toLowerCase() !== "power"){
+//         const superInfo = cache.getKey('superhero_info');
+//         //gets matching heroes
+//         matchingHeroes = superInfo.filter((hero)=>{
+//             hero[field] && hero[field].toLowerCase().includes(pattern.toLowerCase());
+//         });
+
+//         heroIDs = matchingHeroes.map((item)=>{
+//             item.id
+//         });
 
         
-    }else{
+//     }else{
 
-        const superHeroPowers = cache.getKey('superhero_powers');
-        matchingHeroes = superHeroPowers.filter((powers)=>{
-            powers[pattern]==="True"
-        });
-        matchingHeroes = remove(matchingHeroes);//removes matching heroes from the results list
+//         const superHeroPowers = cache.getKey('superhero_powers');
+//         matchingHeroes = superHeroPowers.filter((powers)=>{
+//             powers[pattern]==="True"
+//         });
+//         matchingHeroes = remove(matchingHeroes);//removes matching heroes from the results list
 
-        heroIDs = matchingHeroes.map((hero)=>{
-            const heroName = hero.hero_names;
-            const matchingHero = superInfo.find((info)=>{
-                info.name ===heroName;
-            });
+//         heroIDs = matchingHeroes.map((hero)=>{
+//             const heroName = hero.hero_names;
+//             const matchingHero = superInfo.find((info)=>info.name ===heroName);
 
-            if(matchingHero){
-                return matchingHero.id;
-            }
-        });
+//             if(matchingHero){
+//                 return matchingHero.id;
+//             }
+//         });
 
-    }
+//     }
 
-    heroIDs = heroIDs.filter((id) =>{
-        id !== undefined
-    });
+//     heroIDs = heroIDs.filter((id) =>{
+//         id !== undefined
+//     });
 
-    let heroList = heroIDs.map((id) =>{
-        const superHero = heroIDs.map((hero)=>{
-            hero.id ===id;
-        });
-        if(superHero){
-            let powers = superHeroPowers.find((powers)=>{
-                powers.hero_names ===superHero.name;
-            });
-            powers = deleteAttributes(powers);
-            return{name: superHero.name, info: superHero, powers };
-        }
-        return null;
-    });
+//     let heroList = heroIDs.map((id) =>{
+//         const superHero = heroIDs.map((hero)=>{
+//             hero.id ===id;
+//         });
+//         if(superHero){
+//             let powers = superHeroPowers.find((powers)=>powers.hero_names ===superHero.name);
+//             powers = deleteAttributes(powers);
+//             return{name: superHero.name, info: superHero, powers };
+//         }
+//         return null;
+//     });
 
-    let listsName = "NONE";
+//     let listsName = "NONE";
 
-    if(n && heroList.length>n){
-        heroList = heroList.slide(0,n);
-    }//cuts the search to fit the limit
+//     if(n && heroList.length>n){
+//         heroList = heroList.slide(0,n);
+//     }//cuts the search to fit the limit
 
-    res.json({
-        listsName, 
-        superheroes: heroList.filter(Boolean)
-    });
-});
+//     res.json({
+//         listsName, 
+//         superheroes: heroList.filter(Boolean)
+//     });
+// });
 
 //create list
 app.post('/lists', (req,res)=>{
@@ -245,13 +303,9 @@ app.get('/lists/:name/superheroes', (req,res)=>{
     const heroIDs = lists[listName];
     //heroID
     const heroList = heroIDs.map((id)=>{
-        const superhero = superInfo.find((hero)=>{
-            hero.id ===id;
-        });
+        const superhero = superInfo.find((hero)=>hero.id ===id);
         if(superhero){
-            let powers = superHeroPowers.find((powers) =>{
-                powers.hero_names === superhero.name;
-            });
+            let powers = superHeroPowers.find((powers) =>powers.hero_names === superhero.name);
             powers = deleteAttributes(powers);
             return{name: superhero, info: superhero, powers};
 
@@ -259,7 +313,6 @@ app.get('/lists/:name/superheroes', (req,res)=>{
         return null;
     });
     res.json({listName, superheroes: heroList.filter(Boolean)});
-    //returns superhero info
 });
 
 function deleteAttributes(data){
@@ -274,17 +327,18 @@ function deleteAttributes(data){
     return result;
 }
 
-function remove(jsonData){
-    if(jsonData && jsonData.hero_names){
-        const cleanedData = {hero_names: jsonData.hero_names};
-        for(const key in jsonData){
-            if(jsonData[key] ==="True"){
-                cleanedData[key] = 'True';
-            }
+function remove(jsonData) {
+    if (jsonData && jsonData.hero_names) {
+      const cleanedData = { hero_names: jsonData.hero_names };
+      
+      for (const key in jsonData) {
+        if (jsonData[key] === 'True') {
+          cleanedData[key] = 'True';
         }
-
-        return cleanedData;
+      }
+  
+      return cleanedData;
     }
-
+  
     return jsonData;
-}
+  }
