@@ -1,6 +1,5 @@
 # Superhero-Site
 
-# Superhero Data Web App
 
 This project, completed as part of one of my software classes, focuses on designing and implementing a robust ReST API for accessing superhero data from movies, cartoons, and books. The backend is built using Node.js and Express, providing a scalable and efficient solution for retrieving superhero information from provided JSON files.
 
