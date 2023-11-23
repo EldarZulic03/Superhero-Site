@@ -21,7 +21,7 @@ To access the superhero data web app, follow these steps:
 1. Clone the repository to your local machine.
 2. Navigate to the `client` directory for the frontend files and the `server` directory for the backend files.
 3. Ensure Node.js is installed and run `npm install` to install the necessary dependencies.
-4. Run the application using `npm start`.
+4. Navigate to the `server` directory and run `node index.js`
 5. Access the web app on your local machine or deploy it to a public URL.
 
 
